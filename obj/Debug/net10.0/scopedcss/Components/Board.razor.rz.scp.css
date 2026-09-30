@@ -1,4 +1,4 @@
-.game-board {
+.game-board[b-2hsj6j6moh] {
     display: grid;
     grid-template-columns: repeat(7, 60px);
     gap: 6px;
@@ -8,14 +8,14 @@
     border-radius: 12px;
 }
 
-.slot {
+.slot[b-2hsj6j6moh] {
     width: 60px;
     height: 60px;
     background-color: white;
     border-radius: 50%;
 }
 
-.hole {
+.hole[b-2hsj6j6moh] {
     width: 50px;
     height: 50px;
 

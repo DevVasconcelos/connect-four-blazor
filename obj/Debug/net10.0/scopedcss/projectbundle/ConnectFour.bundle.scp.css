@@ -1,3 +1,30 @@
+/* /Components/Board.razor.rz.scp.css */
+.game-board[b-2hsj6j6moh] {
+    display: grid;
+    grid-template-columns: repeat(7, 60px);
+    gap: 6px;
+    width: fit-content;
+    padding: 12px;
+    background-color: #f4c430;
+    border-radius: 12px;
+}
+
+.slot[b-2hsj6j6moh] {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.hole[b-2hsj6j6moh] {
+    width: 50px;
+    height: 50px;
+
+    display: block;
+
+    background: white;
+    border-radius: 50%;
+}
 /* /Components/Layout/MainLayout.razor.rz.scp.css */
 .page[b-dzoor4i9v5] {
     position: relative;

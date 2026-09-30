@@ -71,8 +71,6 @@ C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\127ln78bqb-{0}-0
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\6c2w37mbjq-{0}-abdmv1u4y3-abdmv1u4y3.gz
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\38grwflvg6-{0}-9hsif5t8mt-9hsif5t8mt.gz
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\fecu9w6d36-{0}-dwu72t6gfx-dwu72t6gfx.gz
-C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\8t7ubqbmk6-{0}-0kri1a7udx-0kri1a7udx.gz
-C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\qps0edvuu1-{0}-0kri1a7udx-0kri1a7udx.gz
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\staticwebassets.build.json
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\staticwebassets.build.json.cache
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\staticwebassets.development.json
@@ -83,3 +81,7 @@ C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\refint\ConnectFour.dll
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\ConnectFour.pdb
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\ConnectFour.genruntimeconfig.cache
 C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\ref\ConnectFour.dll
+C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\ConnectFour.sourcelink.json
+C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\scopedcss\Components\Board.razor.rz.scp.css
+C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\8t7ubqbmk6-{0}-0x4f73luud-0x4f73luud.gz
+C:\Projetos-Dev\Blazor\ConnectFour\obj\Debug\net10.0\compressed\qps0edvuu1-{0}-0x4f73luud-0x4f73luud.gz
