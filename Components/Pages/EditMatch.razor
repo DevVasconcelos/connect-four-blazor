@@ -1,0 +1,128 @@
+@page "/matches/{Id:guid}/edit"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject GameRecordStore MatchStore
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Edit Match | Connect Four</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">UPDATE</p>
+        <h1>Edit match</h1>
+        <p class="text-secondary">Correct the saved result or add a note.</p>
+    </div>
+</div>
+
+@if (_loading)
+{
+    <div class="page-card narrow-card" role="status">Loading match...</div>
+}
+else if (_model is null)
+{
+    <div class="page-card narrow-card">
+        <div class="alert alert-warning" role="alert">@(_errorMessage ?? "Match not found.")</div>
+        <a class="btn btn-outline-secondary" href="matches">Back to history</a>
+    </div>
+}
+else
+{
+    <section class="page-card narrow-card">
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@_errorMessage</div>
+        }
+
+        <MatchForm Model="_model" OnValidSubmit="SaveAsync" IsSaving="_saving" SubmitLabel="Save changes" />
+    </section>
+}
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private GameRecord? _model;
+    private Guid _userId;
+    private bool _loading = true;
+    private bool _saving;
+    private string? _errorMessage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _errorMessage = null;
+
+        try
+        {
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userIdValue = authenticationState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdValue, out _userId))
+            {
+                _errorMessage = "Your session could not be identified. Please sign in again.";
+                return;
+            }
+
+            var record = await MatchStore.GetByIdAsync(_userId, Id);
+            if (record is null)
+            {
+                _errorMessage = "The requested match was not found.";
+                return;
+            }
+
+            _model = new GameRecord
+            {
+                Id = record.Id,
+                UserId = record.UserId,
+                PlayerOneName = record.PlayerOneName,
+                PlayerTwoName = record.PlayerTwoName,
+                Outcome = record.Outcome,
+                MoveCount = record.MoveCount,
+                Notes = record.Notes,
+                PlayedAtUtc = record.PlayedAtUtc
+            };
+        }
+        catch (InvalidOperationException ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_saving || _model is null)
+        {
+            return;
+        }
+
+        _saving = true;
+        _errorMessage = null;
+
+        try
+        {
+            _model.UserId = _userId;
+            var updated = await MatchStore.UpdateAsync(_model);
+
+            if (!updated)
+            {
+                _errorMessage = "The match no longer exists.";
+                return;
+            }
+
+            Navigation.NavigateTo("/matches");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+}

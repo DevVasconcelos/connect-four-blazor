@@ -1,0 +1,67 @@
+@page "/register"
+@attribute [AllowAnonymous]
+
+<PageTitle>Create account | Connect Four</PageTitle>
+
+<div class="auth-shell">
+    <section class="page-card auth-card">
+        <p class="eyebrow">ACCOUNT</p>
+        <h1>Create account</h1>
+        <p class="text-secondary">Usernames are private to this application. Passwords are stored as secure hashes.</p>
+
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="alert alert-danger" role="alert">@Error</div>
+        }
+
+        <form method="post" action="/auth/register" data-enhance="false">
+            <AntiforgeryToken />
+
+            <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-control"
+                       id="username"
+                       name="username"
+                       type="text"
+                       autocomplete="username"
+                       minlength="3"
+                       maxlength="30"
+                       pattern="[A-Za-z0-9._-]+"
+                       aria-describedby="username-help"
+                       required />
+                <div id="username-help" class="form-text">3–30 characters: letters, numbers, dots, underscores, or hyphens.</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control"
+                       id="password"
+                       name="password"
+                       type="password"
+                       autocomplete="new-password"
+                       minlength="8"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="confirm-password">Confirm password</label>
+                <input class="form-control"
+                       id="confirm-password"
+                       name="confirmPassword"
+                       type="password"
+                       autocomplete="new-password"
+                       minlength="8"
+                       required />
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Create account</button>
+        </form>
+
+        <p class="auth-footer">Already registered? <a href="login">Sign in</a>.</p>
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+}

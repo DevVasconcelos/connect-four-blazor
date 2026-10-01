@@ -1,0 +1,6 @@
+.git
+.vs
+bin
+obj
+App_Data/*.json
+App_Data/*.tmp

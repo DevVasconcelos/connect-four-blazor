@@ -1,91 +1,166 @@
 @rendermode InteractiveServer
+@inject GameRecordStore MatchStore
 
-<div class="game-container">
-    <div class="game-header">
-        <h3>@StatusMessage</h3>
-        <button class="new-game-button" @onclick="NewGame">
-            New Game
-        </button>
+<section class="game-container" aria-labelledby="game-title">
+    <div class="player-setup page-card">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">PLAYERS</p>
+                <h2 id="game-title">Game setup</h2>
+            </div>
+            <button class="btn btn-outline-secondary" @onclick="NewGame">New game</button>
+        </div>
+
+        <div class="player-inputs">
+            <div>
+                <label for="player-one">Player 1</label>
+                <input id="player-one"
+                       class="form-control"
+                       maxlength="30"
+                       disabled="@(_moves.Count > 0)"
+                       @bind="_playerOneName" />
+            </div>
+            <div>
+                <label for="player-two">Player 2</label>
+                <input id="player-two"
+                       class="form-control"
+                       maxlength="30"
+                       disabled="@(_moves.Count > 0)"
+                       @bind="_playerTwoName" />
+            </div>
+        </div>
     </div>
 
-    <div class="column-buttons">
-        @for (var col = 0; col < Columns; col++)
-        {
-            var column = col;
+    <div class="game-layout">
+        <div class="board-panel page-card">
+            <div class="game-status" aria-live="polite">
+                <span class="status-dot player-@_currentPlayer" aria-hidden="true"></span>
+                <strong>@StatusMessage</strong>
+            </div>
 
-            <button @onclick="() => DropPiece(column)"
-                    disabled="@(_gameOver || _board[0, column] != 0)"
-                    aria-label="Drop piece in column @(column + 1)">
-                ↓
-            </button>
-        }
-    </div>
+            <div class="board-scroll" tabindex="0" aria-label="Scrollable Connect Four game board">
+                <div class="column-buttons" aria-label="Choose a column">
+                    @for (var col = 0; col < Columns; col++)
+                    {
+                        var column = col;
+                        <button class="drop-button"
+                                @onclick="() => DropPiece(column)"
+                                disabled="@(_gameOver || _board[0, column] != 0)"
+                                aria-label="Drop piece in column @(column + 1)">
+                            <span aria-hidden="true">↓</span>
+                        </button>
+                    }
+                </div>
 
-    <div class="game-board">
-        @for (var row = 0; row < Rows; row++)
-        {
-            @for (var col = 0; col < Columns; col++)
+                <div class="game-board" role="grid" aria-label="Connect Four board">
+                    @for (var row = 0; row < Rows; row++)
+                    {
+                        @for (var col = 0; col < Columns; col++)
+                        {
+                            var cell = _board[row, col];
+                            <div class="slot @GetCellClass(cell)"
+                                 role="gridcell"
+                                 aria-label="@GetCellLabel(row, col, cell)">
+                                @if (cell != 0)
+                                {
+                                    <span class="piece-label" aria-hidden="true">@cell</span>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            @if (_gameOver)
             {
-                var cell = _board[row, col];
+                <div class="result-panel" role="status">
+                    <strong>@FinalResult</strong>
 
-                <div class="slot @GetCellClass(cell)"></div>
+                    <AuthorizeView>
+                        <Authorized>
+                            <form method="post" action="/matches/save-game" class="save-match-form">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="playerOneName" value="@PlayerOneName" />
+                                <input type="hidden" name="playerTwoName" value="@PlayerTwoName" />
+                                <input type="hidden" name="outcome" value="@CurrentOutcome" />
+                                <input type="hidden" name="moveCount" value="@_moves.Count" />
+                                <button class="btn btn-primary" type="submit">Save match</button>
+                            </form>
+                        </Authorized>
+                        <NotAuthorized>
+                            <span><a href="login">Sign in</a> to save this result.</span>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
             }
-        }
-    </div>
 
-    <div class="move-history">
-        <h4>Move History</h4>
+        </div>
 
-        @if (_moves.Count == 0)
-        {
-            <p>No moves yet.</p>
-        }
-        else
-        {
-            <ol>
-                @foreach (var move in _moves)
-                {
-                    <li>@move</li>
-                }
-            </ol>
-        }
+        <aside class="move-history page-card" aria-labelledby="history-title">
+            <h2 id="history-title">Move history</h2>
+            <p class="text-secondary small">Moves: @_moves.Count / 42</p>
+
+            @if (_moves.Count == 0)
+            {
+                <p>No moves yet. Choose a column to begin.</p>
+            }
+            else
+            {
+                <ol>
+                    @foreach (var move in _moves)
+                    {
+                        <li>@move</li>
+                    }
+                </ol>
+            }
+        </aside>
     </div>
-</div>
+</section>
 
 @code {
     private const int Rows = 6;
     private const int Columns = 7;
 
     private int[,] _board = new int[Rows, Columns];
-
     private int _currentPlayer = 1;
     private int _winner;
     private bool _gameOver;
+    private string _playerOneName = "Player 1";
+    private string _playerTwoName = "Player 2";
+    private readonly List<string> _moves = [];
 
-    private readonly List<string> _moves = new();
+    private string PlayerOneName => NormalizePlayerName(_playerOneName, "Player 1");
+    private string PlayerTwoName => NormalizePlayerName(_playerTwoName, "Player 2");
 
     private string StatusMessage =>
         _winner != 0
-            ? $"Player {_winner} wins!"
+            ? $"{GetPlayerName(_winner)} wins!"
             : _gameOver
                 ? "Draw!"
-                : $"Player {_currentPlayer}'s turn";
+                : $"{GetPlayerName(_currentPlayer)}'s turn";
+
+    private string FinalResult => _winner == 0
+        ? "The match ended in a draw."
+        : $"Winner: {GetPlayerName(_winner)}";
+
+    private string CurrentOutcome => _winner == 0 ? "Draw" : GetPlayerName(_winner);
 
     private void DropPiece(int column)
     {
         if (_gameOver)
+        {
             return;
+        }
 
         for (var row = Rows - 1; row >= 0; row--)
         {
             if (_board[row, column] != 0)
+            {
                 continue;
+            }
 
             _board[row, column] = _currentPlayer;
-
-            _moves.Add(
-                $"Player {_currentPlayer} - Column {column + 1}"
-            );
+            _moves.Add($"{GetPlayerName(_currentPlayer)} — column {column + 1}");
 
             if (CheckWin(row, column))
             {
@@ -105,58 +180,36 @@
         }
     }
 
+    // A new piece can only create a win along one of these four axes.
     private bool CheckWin(int row, int column)
     {
-        return CountConnected(row, column, 0, 1) >= 4 ||
-               CountConnected(row, column, 1, 0) >= 4 ||
-               CountConnected(row, column, 1, 1) >= 4 ||
-               CountConnected(row, column, 1, -1) >= 4;
+        return CountConnected(row, column, 0, 1) >= 4
+            || CountConnected(row, column, 1, 0) >= 4
+            || CountConnected(row, column, 1, 1) >= 4
+            || CountConnected(row, column, 1, -1) >= 4;
     }
 
-    private int CountConnected(
-        int row,
-        int column,
-        int rowDirection,
-        int columnDirection)
+    private int CountConnected(int row, int column, int rowDirection, int columnDirection)
     {
         var player = _board[row, column];
-
         return 1
-            + CountDirection(
-                row,
-                column,
-                rowDirection,
-                columnDirection,
-                player)
-            + CountDirection(
-                row,
-                column,
-                -rowDirection,
-                -columnDirection,
-                player);
+            + CountDirection(row, column, rowDirection, columnDirection, player)
+            + CountDirection(row, column, -rowDirection, -columnDirection, player);
     }
 
-    private int CountDirection(
-        int row,
-        int column,
-        int rowDirection,
-        int columnDirection,
-        int player)
+    private int CountDirection(int row, int column, int rowDirection, int columnDirection, int player)
     {
         var count = 0;
-
         row += rowDirection;
         column += columnDirection;
 
-        while (
-            row >= 0 &&
-            row < Rows &&
-            column >= 0 &&
-            column < Columns &&
-            _board[row, column] == player)
+        while (row >= 0
+               && row < Rows
+               && column >= 0
+               && column < Columns
+               && _board[row, column] == player)
         {
             count++;
-
             row += rowDirection;
             column += columnDirection;
         }
@@ -169,125 +222,41 @@
         for (var column = 0; column < Columns; column++)
         {
             if (_board[0, column] == 0)
+            {
                 return false;
+            }
         }
 
         return true;
     }
 
-    private string GetCellClass(int cell)
+    private string GetCellClass(int cell) => cell switch
     {
-        return cell switch
-        {
-            1 => "player-one",
-            2 => "player-two",
-            _ => string.Empty
-        };
+        1 => "player-one",
+        2 => "player-two",
+        _ => string.Empty
+    };
+
+    private string GetCellLabel(int row, int column, int cell)
+    {
+        var content = cell == 0 ? "empty" : $"occupied by {GetPlayerName(cell)}";
+        return $"Row {row + 1}, column {column + 1}, {content}";
+    }
+
+    private string GetPlayerName(int player) => player == 1 ? PlayerOneName : PlayerTwoName;
+
+    private static string NormalizePlayerName(string? name, string fallback)
+    {
+        var normalized = name?.Trim();
+        return string.IsNullOrWhiteSpace(normalized) ? fallback : normalized;
     }
 
     private void NewGame()
     {
         _board = new int[Rows, Columns];
-
         _currentPlayer = 1;
         _winner = 0;
         _gameOver = false;
-
         _moves.Clear();
     }
 }
-
-<style>
-    .game-container {
-        width: fit-content;
-        margin-top: 20px;
-    }
-
-    .game-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 12px;
-    }
-
-    .game-header h3 {
-        margin: 0;
-    }
-
-    .new-game-button {
-        border: none;
-        border-radius: 6px;
-        padding: 8px 16px;
-        background-color: #212529;
-        color: white;
-        cursor: pointer;
-    }
-
-    .column-buttons {
-        display: grid;
-        grid-template-columns: repeat(7, 60px);
-        gap: 6px;
-        padding: 0 12px;
-        margin-bottom: 6px;
-    }
-
-    .column-buttons button {
-        width: 60px;
-        height: 36px;
-        border: none;
-        border-radius: 6px;
-        background-color: #0d6efd;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-    }
-
-    .column-buttons button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-    .game-board {
-        display: grid;
-        grid-template-columns: repeat(7, 60px);
-        gap: 6px;
-        width: fit-content;
-        padding: 12px;
-        background-color: #f4c430;
-        border-radius: 12px;
-    }
-
-    .slot {
-        width: 60px;
-        height: 60px;
-        background-color: white;
-        border-radius: 50%;
-    }
-
-    .slot.player-one {
-        background-color: #dc3545;
-    }
-
-    .slot.player-two {
-        background-color: #0d6efd;
-    }
-
-    .move-history {
-        margin-top: 20px;
-        padding: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        max-height: 220px;
-        overflow-y: auto;
-    }
-
-    .move-history h4 {
-        margin-top: 0;
-    }
-
-    .move-history ol {
-        margin-bottom: 0;
-        padding-left: 25px;
-    }
-</style>

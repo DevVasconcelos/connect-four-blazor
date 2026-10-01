@@ -1,0 +1,31 @@
+@page "/about"
+@attribute [AllowAnonymous]
+
+<PageTitle>About | Connect Four</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">ABOUT</p>
+        <h1>Connect Four Match Tracker</h1>
+        <p class="text-secondary">A .NET Blazor web application for casual players who want to play and keep a private match history.</p>
+    </div>
+</div>
+
+<section class="page-card content-prose">
+    <h2>How it works</h2>
+    <p>
+        Two players share one device and take turns dropping pieces into the board. The application detects wins and draws automatically.
+        Signed-in users can save completed games, add match records manually, edit them, and delete them.
+    </p>
+
+    <h2>Privacy and accounts</h2>
+    <p>
+        Match history is separated by account. Passwords are never stored as plain text; the application uses ASP.NET Core's password hasher.
+    </p>
+
+    <h2>Accessibility</h2>
+    <p>
+        The interface uses semantic headings, keyboard-focus indicators, explicit labels, accessible status messages, responsive layouts,
+        and text labels in addition to piece colors.
+    </p>
+</section>

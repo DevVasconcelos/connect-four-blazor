@@ -1,0 +1,67 @@
+<EditForm Model="Model" OnValidSubmit="HandleValidSubmit" class="match-form">
+    <DataAnnotationsValidator />
+    <ValidationSummary class="alert alert-danger" />
+
+    <div class="form-grid">
+        <div>
+            <label class="form-label" for="player-one-name">Player 1</label>
+            <InputText id="player-one-name" class="form-control" @bind-Value="Model.PlayerOneName" />
+            <ValidationMessage For="@(() => Model.PlayerOneName)" />
+        </div>
+
+        <div>
+            <label class="form-label" for="player-two-name">Player 2</label>
+            <InputText id="player-two-name" class="form-control" @bind-Value="Model.PlayerTwoName" />
+            <ValidationMessage For="@(() => Model.PlayerTwoName)" />
+        </div>
+
+        <div>
+            <label class="form-label" for="outcome">Outcome</label>
+            <InputSelect id="outcome" class="form-select" @bind-Value="Model.Outcome">
+                <option value="Draw">Draw</option>
+                <option value="@Model.PlayerOneName">@DisplayPlayerOne</option>
+                <option value="@Model.PlayerTwoName">@DisplayPlayerTwo</option>
+            </InputSelect>
+            <ValidationMessage For="@(() => Model.Outcome)" />
+        </div>
+
+        <div>
+            <label class="form-label" for="move-count">Move count</label>
+            <InputNumber id="move-count" class="form-control" @bind-Value="Model.MoveCount" />
+            <ValidationMessage For="@(() => Model.MoveCount)" />
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <label class="form-label" for="notes">Notes <span class="text-secondary">(optional)</span></label>
+        <InputTextArea id="notes" class="form-control" rows="4" @bind-Value="Model.Notes" />
+        <div class="form-text">Maximum 200 characters.</div>
+        <ValidationMessage For="@(() => Model.Notes)" />
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary" disabled="@IsSaving">
+            @(IsSaving ? "Saving..." : SubmitLabel)
+        </button>
+        <a class="btn btn-outline-secondary" href="matches">Cancel</a>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public GameRecord Model { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool IsSaving { get; set; }
+
+    [Parameter]
+    public string SubmitLabel { get; set; } = "Save match";
+
+    private string DisplayPlayerOne => string.IsNullOrWhiteSpace(Model.PlayerOneName) ? "Player 1" : Model.PlayerOneName;
+    private string DisplayPlayerTwo => string.IsNullOrWhiteSpace(Model.PlayerTwoName) ? "Player 2" : Model.PlayerTwoName;
+
+    private Task HandleValidSubmit() => OnValidSubmit.InvokeAsync();
+}

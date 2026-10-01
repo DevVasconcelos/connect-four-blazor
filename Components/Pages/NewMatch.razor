@@ -1,0 +1,67 @@
+@page "/matches/new"
+@attribute [Authorize]
+@rendermode InteractiveServer
+@inject GameRecordStore MatchStore
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
+
+<PageTitle>Add Match | Connect Four</PageTitle>
+
+<div class="page-heading">
+    <div>
+        <p class="eyebrow">CREATE</p>
+        <h1>Add match</h1>
+        <p class="text-secondary">Add a completed match to your private history.</p>
+    </div>
+</div>
+
+<section class="page-card narrow-card">
+    @if (!string.IsNullOrWhiteSpace(_errorMessage))
+    {
+        <div class="alert alert-danger" role="alert">@_errorMessage</div>
+    }
+
+    <MatchForm Model="_model" OnValidSubmit="SaveAsync" IsSaving="_saving" SubmitLabel="Add match" />
+</section>
+
+@code {
+    private readonly GameRecord _model = new();
+    private bool _saving;
+    private string? _errorMessage;
+
+    private async Task SaveAsync()
+    {
+        if (_saving)
+        {
+            return;
+        }
+
+        _saving = true;
+        _errorMessage = null;
+
+        try
+        {
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userIdValue = authenticationState.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!Guid.TryParse(userIdValue, out var userId))
+            {
+                _errorMessage = "Your session could not be identified. Please sign in again.";
+                return;
+            }
+
+            _model.UserId = userId;
+            _model.PlayedAtUtc = DateTime.UtcNow;
+            await MatchStore.AddAsync(_model);
+            Navigation.NavigateTo("/matches");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _errorMessage = ex.Message;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+}

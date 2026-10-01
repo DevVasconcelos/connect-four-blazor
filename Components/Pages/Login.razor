@@ -1,0 +1,53 @@
+@page "/login"
+@attribute [AllowAnonymous]
+
+<PageTitle>Sign in | Connect Four</PageTitle>
+
+<div class="auth-shell">
+    <section class="page-card auth-card">
+        <p class="eyebrow">ACCOUNT</p>
+        <h1>Sign in</h1>
+        <p class="text-secondary">Access your private match history and save game results.</p>
+
+        @if (!string.IsNullOrWhiteSpace(Error))
+        {
+            <div class="alert alert-danger" role="alert">@Error</div>
+        }
+
+        <form method="post" action="/auth/login" data-enhance="false">
+            <AntiforgeryToken />
+
+            <div class="mb-3">
+                <label class="form-label" for="username">Username</label>
+                <input class="form-control"
+                       id="username"
+                       name="username"
+                       type="text"
+                       autocomplete="username"
+                       minlength="3"
+                       maxlength="30"
+                       required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="password">Password</label>
+                <input class="form-control"
+                       id="password"
+                       name="password"
+                       type="password"
+                       autocomplete="current-password"
+                       minlength="8"
+                       required />
+            </div>
+
+            <button class="btn btn-primary w-100" type="submit">Sign in</button>
+        </form>
+
+        <p class="auth-footer">No account yet? <a href="register">Create one</a>.</p>
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+}

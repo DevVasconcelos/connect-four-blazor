@@ -1,26 +1,211 @@
-.game-board {
+.game-container {
+    margin-top: 1.5rem;
+}
+
+.player-setup {
+    margin-bottom: 1rem;
+}
+
+.section-heading {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.section-heading h2,
+.move-history h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.player-inputs {
     display: grid;
-    grid-template-columns: repeat(7, 60px);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.player-inputs label {
+    display: block;
+    margin-bottom: .4rem;
+    font-weight: 600;
+}
+
+.game-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 1rem;
+    align-items: start;
+}
+
+.board-panel {
+    min-width: 0;
+}
+
+.game-status {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    margin-bottom: 1rem;
+    font-size: 1.05rem;
+}
+
+.status-dot {
+    width: .85rem;
+    height: .85rem;
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
+.status-dot.player-1 {
+    background: #b42318;
+}
+
+.status-dot.player-2 {
+    background: #175cd3;
+}
+
+.board-scroll {
+    overflow-x: auto;
+    padding-bottom: .25rem;
+}
+
+.board-scroll:focus-visible {
+    outline: 3px solid #84adff;
+    outline-offset: 3px;
+    border-radius: .5rem;
+}
+
+.column-buttons,
+.game-board {
+    --cell-size: clamp(42px, 8vw, 66px);
+    display: grid;
+    grid-template-columns: repeat(7, var(--cell-size));
     gap: 6px;
-    width: fit-content;
+    width: max-content;
+}
+
+.column-buttons {
+    padding: 0 12px;
+    margin-bottom: 6px;
+}
+
+.drop-button {
+    width: var(--cell-size);
+    height: 38px;
+    border: 0;
+    border-radius: .5rem;
+    background: #175cd3;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.drop-button:hover:not(:disabled) {
+    background: #1849a9;
+}
+
+.drop-button:focus-visible {
+    outline: 3px solid #84adff;
+    outline-offset: 2px;
+}
+
+.drop-button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.game-board {
     padding: 12px;
-    background-color: #f4c430;
-    border-radius: 12px;
+    background: #123b67;
+    border-radius: 1rem;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15);
 }
 
 .slot {
-    width: 60px;
-    height: 60px;
-    background-color: white;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    display: grid;
+    place-items: center;
     border-radius: 50%;
+    background: #fff;
+    border: 2px solid rgba(15, 23, 42, .12);
 }
 
-.hole {
-    width: 50px;
-    height: 50px;
+.slot.player-one {
+    background: #b42318;
+    border-color: #7a271a;
+}
 
-    display: block;
+.slot.player-two {
+    background: #175cd3;
+    border-color: #194185;
+}
 
-    background: white;
-    border-radius: 50%;
+.piece-label {
+    color: #fff;
+    font-weight: 800;
+    font-size: clamp(.8rem, 2.4vw, 1.1rem);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+}
+
+.result-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: .85rem 1rem;
+    border-radius: .75rem;
+    background: #f0fdf4;
+    border: 1px solid #abefc6;
+}
+
+.move-history {
+    max-height: 560px;
+    overflow-y: auto;
+}
+
+.move-history ol {
+    margin-bottom: 0;
+    padding-left: 1.4rem;
+}
+
+.move-history li + li {
+    margin-top: .35rem;
+}
+
+@media (max-width: 900px) {
+    .game-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .move-history {
+        max-height: 260px;
+    }
+}
+
+@media (max-width: 520px) {
+    .player-inputs {
+        grid-template-columns: 1fr;
+    }
+
+    .section-heading {
+        align-items: center;
+    }
+
+    .column-buttons,
+    .game-board {
+        --cell-size: 40px;
+        gap: 4px;
+    }
+
+    .column-buttons,
+    .game-board {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
 }

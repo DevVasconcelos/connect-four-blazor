@@ -1,5 +1,19 @@
+# .NET build output
 bin/
 obj/
+
+# Visual Studio / VS Code
 .vs/
 *.user
 *.suo
+
+# Local application data (created at runtime)
+App_Data/*.json
+App_Data/*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local application data
+App_Data/*.json
