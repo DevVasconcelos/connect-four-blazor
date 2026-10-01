@@ -55,18 +55,20 @@
                 <div class="game-board" role="grid" aria-label="Connect Four board">
                     @for (var row = 0; row < Rows; row++)
                     {
-                        @for (var col = 0; col < Columns; col++)
-                        {
-                            var cell = _board[row, col];
-                            <div class="slot @GetCellClass(cell)"
-                                 role="gridcell"
-                                 aria-label="@GetCellLabel(row, col, cell)">
-                                @if (cell != 0)
-                                {
-                                    <span class="piece-label" aria-hidden="true">@cell</span>
-                                }
-                            </div>
-                        }
+                        <div class="game-row" role="row">
+                            @for (var col = 0; col < Columns; col++)
+                            {
+                                var cell = _board[row, col];
+                                <div class="slot @GetCellClass(cell)"
+                                     role="gridcell"
+                                     aria-label="@GetCellLabel(row, col, cell)">
+                                    @if (cell != 0)
+                                    {
+                                        <span class="piece-label" aria-hidden="true">@cell</span>
+                                    }
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
             </div>

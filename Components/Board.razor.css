@@ -80,13 +80,13 @@
 .column-buttons,
 .game-board {
     --cell-size: clamp(42px, 8vw, 66px);
-    display: grid;
-    grid-template-columns: repeat(7, var(--cell-size));
-    gap: 6px;
     width: max-content;
 }
 
 .column-buttons {
+    display: grid;
+    grid-template-columns: repeat(7, var(--cell-size));
+    gap: 6px;
     padding: 0 12px;
     margin-bottom: 6px;
 }
@@ -118,10 +118,18 @@
 }
 
 .game-board {
+    display: grid;
+    gap: 6px;
     padding: 12px;
     background: #123b67;
     border-radius: 1rem;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15);
+}
+
+.game-row {
+    display: grid;
+    grid-template-columns: repeat(7, var(--cell-size));
+    gap: 6px;
 }
 
 .slot {
